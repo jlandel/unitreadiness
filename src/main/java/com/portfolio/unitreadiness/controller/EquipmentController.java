@@ -6,6 +6,7 @@ import com.portfolio.unitreadiness.repository.EquipmentRepository;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,8 +31,14 @@ public class EquipmentController {
         this.equipmentRepository = equipmentRepository;
     }
 
-    @GetMapping
-    public List<Equipment> getAllEquipment() {
+   @GetMapping
+public List<Equipment> getAllEquipment(
+        @RequestParam(required = false) String unit) {
+
+    if (unit != null && !unit.isBlank()) {
+        return equipmentRepository.findByAssignedUnitIgnoreCase(unit);
+    }
+
         return equipmentRepository.findAll();
     }
 

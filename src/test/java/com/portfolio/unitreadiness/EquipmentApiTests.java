@@ -12,6 +12,7 @@ import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRe
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
@@ -114,4 +115,37 @@ class EquipmentApiTests {
         // Assert: verify equipment no longer exists
         assertFalse(equipmentRepository.existsById(id));
     }
+
+    
+@Test
+void shouldFilterEquipmentByUnit() {
+
+    equipmentRepository.deleteAll();
+
+    equipmentRepository.save(new Equipment(
+            "Test Radio",
+            "Communications",
+            "FMC",
+            "DEMO-001"
+    ));
+
+    equipmentRepository.save(new Equipment(
+            "Test Laptop",
+            "Computer",
+            "NMC",
+            "DEMO-002"
+    ));
+
+    ResponseEntity<Equipment[]> response =
+            restTemplate.getForEntity(
+                    "/api/equipment?unit=DEMO-001",
+                    Equipment[].class
+            );
+
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertNotNull(response.getBody());
+    assertEquals(1, response.getBody().length);
+    assertEquals("Test Radio", response.getBody()[0].getName());
+}
+
 }
